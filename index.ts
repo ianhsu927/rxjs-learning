@@ -8,6 +8,7 @@ import {
   catchError,
   of,
   interval,
+  throttleTime,
 } from "rxjs";
 import { ajax } from "rxjs/ajax";
 
@@ -86,4 +87,29 @@ function timerEvent() {
   );
 }
 
-timerEvent();
+function formEvent() {
+  const form = document.getElementById("rxForm")!;
+  const formSubmit$ = fromEvent(form, "submit");
+  formSubmit$
+    .pipe(
+      map((event) => {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        return formData.get("name");
+      })
+    )
+    .subscribe(console.log);
+}
+
+function scrollEvent() {
+  const scroll$ = fromEvent(window, "scroll");
+  scroll$
+    .pipe(
+      throttleTime(200),
+      map(() => window.screenY)
+    )
+    .subscribe((scrollPosition) =>
+      console.log("Scroll Position:", scrollPosition)
+    );
+}
+scrollEvent();
